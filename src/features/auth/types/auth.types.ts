@@ -24,12 +24,3 @@ export interface ApiError {
   message: string;
   status?: number;
 }
-
-export interface RefreshTokenRequest {
-  refreshToken: string;
-}
-
-export interface RefreshTokenResponse {
-  token: string;
-  refreshToken?: string;
-}
