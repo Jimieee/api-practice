@@ -1,50 +1,91 @@
-# React + TypeScript + Vite
+# Booking & Accommodations App (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Developed by [BORISM4](https://github.com/BORISM4) and [Jimieee](https://github.com/Jimieee)
 
-Currently, two official plugins are available:
+This is a test web application that connects to a public API for managing **accommodations and bookings**, available here:  
+👉 [API Documentation](https://apibookingsaccomodations-production.up.railway.app/api/documentation)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The project uses **Atomic Design** principles for building the UI and follows a modular, domain-based folder structure for organization and scalability.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## ✨ Features
 
-- Configure the top-level `parserOptions` property like this:
+- 🔐 User authentication (login)
+- 🏘️ Property listing and management
+- 📅 Booking/reservation management with a calendar
+- ⚙️ Organized modular architecture using `features/` and shared logic
+- 💅 Reusable components: buttons, inputs, dialogs, modals, etc.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+---
+
+## 🧱 Project Structure
+
+```
+src/
+├── components/         # Atomic Design: atoms, molecules, organisms, templates
+├── features/           # Domain modules: auth, reservations, properties
+├── routing/            # Routes and guards (auth, guest)
+├── providers/          # Context and layout providers
+├── lib/                # Axios setup and helpers
+├── assets/             # Static files
+└── ui/                 # UI primitives using Tailwind CSS
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Each `feature/` folder includes:
+- `components/`: Local reusable components
+- `hooks/`: Custom hooks for logic or data fetching
+- `services/`: API interaction functions
+- `types/`: TypeScript interfaces and types
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+---
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+## 🚀 Getting Started
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/your-username/booking-app.git
+cd booking-app
 ```
+
+### 2. Install dependencies
+```bash
+npm install
+```
+
+### 3. Run the development server
+```bash
+npm run dev
+```
+
+Go to [http://localhost:5173](http://localhost:5173) to see it running.
+
+---
+
+## ⚙️ Tech Stack
+
+- React + Vite + TypeScript
+- React Hook Form
+- Tailwind CSS
+- Zod
+- Axios
+
+---
+
+## 📄 Pages Overview
+
+- `/login` – Authentication page
+- `/dashboard` – Main dashboard 
+- `/properties` – Manage properties
+- `/reservations` – View and manage bookings
+
+---
+
+## 🧠 Design Principles
+
+This project follows **Atomic Design** methodology:
+
+- **Atoms:** Small elements (Button, Input, Icon)
+- **Molecules:** Groups of atoms (FormField, PropertyCard)
+- **Organisms:** Larger components (LoginForm, Sidebar, Calendar)
+- **Templates:** Layout wrappers for entire pages
