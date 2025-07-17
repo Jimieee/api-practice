@@ -18,7 +18,6 @@ export const PropertyFormModal: React.FC<PropertyFormModalProps> = ({
     control,
     handleSubmit,
     reset,
-    formState: { errors }
   } = useForm<PropertyFormData>({
     resolver: zodResolver(propertyFormSchema),
     defaultValues: {
