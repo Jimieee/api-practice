@@ -10,8 +10,8 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   },
   {
     id: "properties",
-    label: "Properties",
-    href: "/properties",
+    label: "Reservaciones",
+    href: "/reservations",
     icon: Building,
   },
 ];

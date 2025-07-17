@@ -1,131 +1,200 @@
-import React, { useState } from 'react';
-import { SectionHeader } from '@/components/molecules/PropertyHeader';
-import { PropertyFormData, PropertyFormModal, PropertyGrid } from '@/components/organisms';
-import { useProperties } from '@/features/properties/hooks/useProperties';
-import { Property } from '@/features/properties/types/property.types';
+import React, { useState } from "react";
+import { SectionHeader } from "@/components/molecules/PropertyHeader";
+import {
+  PropertyFormData,
+  PropertyFormModal,
+  PropertyGrid,
+} from "@/components/organisms";
+import { ReservationCalendar } from "@/components/organisms/ReservationCalendar";
+import { ReservationFormModal } from "@/components/organisms/ReservationFormModal";
+import { useProperties } from "@/features/properties/hooks/useProperties";
+import { useReservations } from "@/features/reservations/hooks/useReservations";
+import { Property } from "@/features/properties/types/property.types";
+import {
+  Reservation,
+  ReservationFormData,
+} from "@/features/reservations/types/reservation.types";
 
-interface ModalState {
+interface PropertyModalState {
   isOpen: boolean;
-  mode: 'create' | 'edit';
+  mode: "create" | "edit";
   editingProperty?: Property;
 }
 
-// interface DeleteState {
-//   isOpen: boolean;
-//   propertyId?: number;
-//   propertyName?: string;
-// }
+interface ReservationModalState {
+  isOpen: boolean;
+  mode: "create" | "edit";
+  editingReservation?: Reservation;
+  selectedAccommodationId?: number;
+}
 
 const DashboardPage: React.FC = () => {
   const {
     properties,
-    loading,
-    error,
+    loading: propertiesLoading,
+    error: propertiesError,
     createProperty,
     updateProperty,
   } = useProperties();
+  const {
+    reservations,
+    loading: reservationsLoading,
+    error: reservationsError,
+    createReservation,
+    updateReservation,
+  } = useReservations();
 
-  const [modalState, setModalState] = useState<ModalState>({
-    isOpen: false,
-    mode: 'create',
-  });
+  const [activeTab, setActiveTab] = useState<"properties" | "reservations">(
+    "properties"
+  );
+  const [selectedAccommodationId, setSelectedAccommodationId] = useState<
+    number | undefined
+  >();
 
-  // const [deleteState, setDeleteState] = useState<DeleteState>({
-  //   isOpen: false,
-  // });
+  const [propertyModalState, setPropertyModalState] =
+    useState<PropertyModalState>({
+      isOpen: false,
+      mode: "create",
+    });
+
+  const [reservationModalState, setReservationModalState] =
+    useState<ReservationModalState>({
+      isOpen: false,
+      mode: "create",
+    });
 
   const [actionLoading, setActionLoading] = useState(false);
 
-  const handleAddNew = () => {
-    setModalState({
+  const handleAddNewProperty = () => {
+    setPropertyModalState({
       isOpen: true,
-      mode: 'create',
+      mode: "create",
       editingProperty: undefined,
     });
   };
 
-  const handleEdit = (id: string) => {
-    const property = properties.find(p => p.id === parseInt(id));
+  const handleEditProperty = (id: string) => {
+    const property = properties.find((p) => p.id === parseInt(id));
     if (property) {
-      setModalState({
+      setPropertyModalState({
         isOpen: true,
-        mode: 'edit',
+        mode: "edit",
         editingProperty: property,
       });
     }
   };
 
-  // const handleDelete = (id: string) => {
-  //   const property = properties.find(p => p.id === parseInt(id));
-  //   if (property) {
-  //     setDeleteState({
-  //       isOpen: true,
-  //       propertyId: property.id,
-  //       propertyName: property.name,
-  //     });
-  //   }
-  // };
-
-  const handleFormSubmit = async (data: PropertyFormData) => {
+  const handlePropertyFormSubmit = async (data: PropertyFormData) => {
     setActionLoading(true);
 
     try {
-      if (modalState.mode === 'create') {
+      if (propertyModalState.mode === "create") {
         await createProperty(data);
-      } else if (modalState.editingProperty) {
-        await updateProperty(modalState.editingProperty.id, data);
+      } else if (propertyModalState.editingProperty) {
+        await updateProperty(propertyModalState.editingProperty.id, data);
       }
 
-      setModalState({ isOpen: false, mode: 'create' });
+      setPropertyModalState({ isOpen: false, mode: "create" });
     } catch (error) {
-      console.error('Error saving property:', error);
+      console.error("Error saving property:", error);
     } finally {
       setActionLoading(false);
     }
   };
 
-  // THE DELETE ROUTE IS NOT IN THE API (im tired lol)
-  // const handleConfirmDelete = async () => {
-  //   if (!deleteState.propertyId) return;
-
-  //   setActionLoading(true);
-
-  //   try {
-  //     await deleteProperty(deleteState.propertyId);
-  //     setDeleteState({ isOpen: false });
-  //   } catch (error) {
-  //     console.error('Error deleting property:', error);
-  //   } finally {
-  //     setActionLoading(false);
-  //   }
-  // };
-
-  const handleCloseModal = () => {
+  const handleClosePropertyModal = () => {
     if (!actionLoading) {
-      setModalState({ isOpen: false, mode: 'create' });
+      setPropertyModalState({ isOpen: false, mode: "create" });
     }
   };
 
-  // const handleCloseDeleteDialog = () => {
-  //   if (!actionLoading) {
-  //     setDeleteState({ isOpen: false });
-  //   }
-  // };
+  // Reservation handlers
+  const handleAddNewReservation = () => {
+    setReservationModalState({
+      isOpen: true,
+      mode: "create",
+      selectedAccommodationId,
+    });
+  };
 
-  const getInitialFormData = (): PropertyFormData | undefined => {
-    if (modalState.mode === 'edit' && modalState.editingProperty) {
+  const handleEventClick = (reservation: Reservation) => {
+    setReservationModalState({
+      isOpen: true,
+      mode: "edit",
+      editingReservation: reservation,
+    });
+  };
+
+  const handleDateSelect = (start: Date, end: Date) => {
+    setReservationModalState({
+      isOpen: true,
+      mode: "create",
+      selectedAccommodationId,
+    });
+  };
+
+  const handleReservationFormSubmit = async (data: ReservationFormData) => {
+    setActionLoading(true);
+
+    try {
+      if (reservationModalState.mode === "create") {
+        await createReservation(data);
+      } else if (reservationModalState.editingReservation) {
+        await updateReservation(
+          reservationModalState.editingReservation.id,
+          data
+        );
+      }
+
+      setReservationModalState({ isOpen: false, mode: "create" });
+    } catch (error) {
+      console.error("Error saving reservation:", error);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCloseReservationModal = () => {
+    if (!actionLoading) {
+      setReservationModalState({ isOpen: false, mode: "create" });
+    }
+  };
+
+  const getInitialPropertyFormData = (): PropertyFormData | undefined => {
+    if (
+      propertyModalState.mode === "edit" &&
+      propertyModalState.editingProperty
+    ) {
       return {
-        id: modalState.editingProperty.id,
-        name: modalState.editingProperty.name,
-        address: modalState.editingProperty.address,
-        description: modalState.editingProperty.description,
+        id: propertyModalState.editingProperty.id,
+        name: propertyModalState.editingProperty.name,
+        address: propertyModalState.editingProperty.address,
+        description: propertyModalState.editingProperty.description,
         image: null,
       };
     }
     return undefined;
   };
 
-  const gridProperties = properties.map(property => ({
+  const getInitialReservationFormData = (): ReservationFormData | undefined => {
+    if (
+      reservationModalState.mode === "edit" &&
+      reservationModalState.editingReservation
+    ) {
+      return {
+        id: reservationModalState.editingReservation.id,
+        booking: `BK${reservationModalState.editingReservation.id}`,
+        check_in_date: reservationModalState.editingReservation.check_in_date,
+        check_out_date: reservationModalState.editingReservation.check_out_date,
+        total_amount: reservationModalState.editingReservation.total_amount,
+        accomodation_id: selectedAccommodationId || 1,
+        user_id: 1,
+      };
+    }
+    return undefined;
+  };
+
+  const gridProperties = properties.map((property) => ({
     id: property.id.toString(),
     title: property.name,
     address: property.address,
@@ -133,7 +202,26 @@ const DashboardPage: React.FC = () => {
     image: property.image,
   }));
 
-  if (error) {
+  const accommodationOptions = properties.map((property) => ({
+    id: property.id,
+    name: property.name,
+  }));
+
+  const filteredReservations = selectedAccommodationId
+    ? reservations.filter((reservation) => {
+        // Buscar la propiedad por ID
+        const selectedProperty = properties.find(
+          (p) => p.id === selectedAccommodationId
+        );
+
+        return (
+          reservation.accomodation === selectedProperty?.name ||
+          reservation.accomodation_id === selectedAccommodationId
+        );
+      })
+    : reservations;
+
+  if (propertiesError || reservationsError) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto">
@@ -141,10 +229,10 @@ const DashboardPage: React.FC = () => {
             <div className="flex">
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800">
-                  Error al cargar las propiedades
+                  Error al cargar los datos
                 </h3>
                 <div className="mt-2 text-sm text-red-700">
-                  {error}
+                  {propertiesError || reservationsError}
                 </div>
               </div>
             </div>
@@ -157,30 +245,110 @@ const DashboardPage: React.FC = () => {
   return (
     <div>
       <div className="max-w-7xl mx-auto">
-        <SectionHeader
-          title="Alojamientos"
-          onAddNew={handleAddNew}
-        />
-
-        {loading && !actionLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        {/* Tabs */}
+        <div className="mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setActiveTab("properties")}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === "properties"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                Alojamientos
+              </button>
+            </nav>
           </div>
-        ) : (
-          <PropertyGrid
-            properties={gridProperties}
-            onEdit={handleEdit}
-          />
+        </div>
+
+        {activeTab === "properties" && (
+          <>
+            <SectionHeader
+              title="Alojamientos"
+              onAddNew={handleAddNewProperty}
+            />
+
+            {propertiesLoading && !actionLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            ) : (
+              <PropertyGrid
+                properties={gridProperties}
+                onEdit={handleEditProperty}
+              />
+            )}
+          </>
+        )}
+
+        {activeTab === "reservations" && (
+          <>
+            <div className="flex justify-between items-center mb-6">
+              <SectionHeader
+                title="Reservaciones"
+                onAddNew={handleAddNewReservation}
+              />
+
+              <div className="flex items-center space-x-4">
+                <label className="text-sm font-medium text-gray-700">
+                  Acomodación:
+                </label>
+                <select
+                  value={selectedAccommodationId || ""}
+                  onChange={(e) =>
+                    setSelectedAccommodationId(
+                      e.target.value ? parseInt(e.target.value) : undefined
+                    )
+                  }
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Todas las acomodaciones</option>
+                  {accommodationOptions.map((accommodation) => (
+                    <option key={accommodation.id} value={accommodation.id}>
+                      {accommodation.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {reservationsLoading && !actionLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            ) : (
+              <ReservationCalendar
+                accommodationId={selectedAccommodationId || 0}
+                reservations={filteredReservations}
+                onEventClick={handleEventClick}
+                onDateSelect={handleDateSelect}
+                loading={reservationsLoading}
+              />
+            )}
+          </>
         )}
       </div>
 
       <PropertyFormModal
-        isOpen={modalState.isOpen}
-        onClose={handleCloseModal}
-        onSubmit={handleFormSubmit}
-        initialData={getInitialFormData()}
-        mode={modalState.mode}
+        isOpen={propertyModalState.isOpen}
+        onClose={handleClosePropertyModal}
+        onSubmit={handlePropertyFormSubmit}
+        initialData={getInitialPropertyFormData()}
+        mode={propertyModalState.mode}
         loading={actionLoading}
+      />
+
+      <ReservationFormModal
+        isOpen={reservationModalState.isOpen}
+        onClose={handleCloseReservationModal}
+        onSubmit={handleReservationFormSubmit}
+        initialData={getInitialReservationFormData()}
+        mode={reservationModalState.mode}
+        loading={actionLoading}
+        accommodations={accommodationOptions}
+        selectedAccommodationId={selectedAccommodationId}
       />
     </div>
   );
