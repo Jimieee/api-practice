@@ -8,6 +8,7 @@ export const reservationSchema = z
     total_amount: z.number().min(0.01, "El monto total debe ser mayor a 0"),
     accomodation_id: z.number().min(1, "Debe seleccionar una acomodación"),
     user_id: z.number().min(1, "Debe indicar el ID de usuario"),
+    status: z.string().optional(),
   })
   .refine(
     (data) => {

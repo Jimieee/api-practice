@@ -10,7 +10,6 @@ const LoginForm = ({ onSubmit, loading = false, error }: LoginFormProps) => {
   const {
     control,
     handleSubmit,
-    formState: { errors }
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {

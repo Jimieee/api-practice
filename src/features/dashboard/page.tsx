@@ -125,7 +125,7 @@ const DashboardPage: React.FC = () => {
     });
   };
 
-  const handleDateSelect = (start: Date, end: Date) => {
+  const handleDateSelect = () => {
     setReservationModalState({
       isOpen: true,
       mode: "create",
@@ -216,7 +216,7 @@ const DashboardPage: React.FC = () => {
 
         return (
           reservation.accomodation === selectedProperty?.name ||
-          reservation.accomodation_id === selectedAccommodationId
+          reservation.id === selectedAccommodationId
         );
       })
     : reservations;
